@@ -32,8 +32,7 @@ int main()
         return -1;
     }
     printf("\n Connection Succesful");
-    printf("\n0x%x", startmsg[0]);
-    printf("\n0x%x", startmsg[1]);
+
     send(sockkfd, &startmsg, 2, 0);
     return 0;
 }
