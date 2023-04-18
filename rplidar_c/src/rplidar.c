@@ -54,8 +54,6 @@ void *flush_buffer(void *arg)
                         {
                             // add message to circular buffer
                             pthread_mutex_lock(&buff_mutex);
-                            // memcpy(&messages[message_index].data[0], buffer, MESSAGE_SIZE);
-                            // message_index = (message_index + 1) % BUFFER_SIZE;
                             memcpy(&messages[message_index], buffer, MESSAGE_SIZE);
                             message_index = (message_index + MESSAGE_SIZE) % BUFFER_BYTES;
                             if (message_count < BUFFER_SIZE) {
@@ -72,16 +70,9 @@ void *flush_buffer(void *arg)
 }
 
 void read_data_test(int *count){
-    int start, quality, angle, distance;
+    uint16_t start, quality, angle, distance;
     pthread_mutex_lock(&buff_mutex);
     int i, j;
-    // for (i = 0, j = message_index; i < message_count; i++, j = (j + MESSAGE_SIZE) % BUFFER_BYTES) {
-        // start = messages[j].data[0] & 1;
-        // quality = messages[j].data[0]>>2;
-        // angle = ((messages[j].data[1]>>1) + (messages[j].data[2]<<8))>>7;
-        // distance = ((messages[j].data[3]) + (messages[j].data[4]<<8))>>2;
-        // printf("Start: %d, Quality: %d, Angle: %d, Dist: %d\n", start, quality, angle, distance);
-    // }
     for (i = 0, j = message_index; i < message_count; i++, j = (j + MESSAGE_SIZE) % BUFFER_BYTES) {
         start = messages[j] & 1;
         quality = messages[j]>>2;
@@ -98,8 +89,7 @@ int main()
     server_rp server;
     pthread_t thread;
     init(&server);
-    //printf("Socket: %d\n", server.socket_fd);
-    
+
     int create_thread_status = pthread_create(&thread, NULL, flush_buffer, &server);
     
     if (create_thread_status != 0) {
@@ -108,7 +98,7 @@ int main()
     }
     sleep(3); // sleep for 3 seconds
 
-    sem_init(&sem_rdy_read, 0, 0);
+    //sem_init(&sem_rdy_read, 0, 0);
     
     int count = 1;
     while (1) {
