@@ -2,14 +2,12 @@
 
 // global circular buffer for storing messages
 char messages[BUFFER_BYTES];
-// lidar_message_t messages[BUFFER_SIZE];
 volatile int message_count = 0; // Global var to count number of messages
 volatile int message_index = 0; // Global var to keep track of message index
 volatile int cox_called_flag = 0;
 
 // mutex for the circular buffer
 pthread_mutex_t buff_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t cox_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *flush_buffer(void *arg)
 {
@@ -17,7 +15,6 @@ void *flush_buffer(void *arg)
 
     while (1)
     {
-        // sleep(3); // sleep for 3 seconds
         char header[MESSAGE_SIZE] = {0};
         char buffer[MESSAGE_SIZE] = {0};
         while (read(server->new_socket, header, sizeof(header)) == MESSAGE_SIZE)

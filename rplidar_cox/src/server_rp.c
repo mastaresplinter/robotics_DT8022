@@ -49,7 +49,7 @@ void terminate(server_rp *server)
     // closing the connected socket
     close(server->new_socket);
     // closing the listening socket
-    // shutdown(server->socket_fd, SHUT_RDWR);
+    shutdown(server->socket_fd, SHUT_RDWR);
     printf("Connection terminated.\n");
 }
 

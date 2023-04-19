@@ -245,13 +245,14 @@ void CoxAlgo()
     int angle, distance;
     int i, j, l, m, n = 0;
     nrOfDatapoints = message_count;
-    // nrOfDatapoints = 149;
 
+    /*Resize matrices to current size depending on amount of data points*/
     LaserPoints.resize(3, nrOfDatapoints);
     shortest.resize(nrOfDatapoints, 2);
     OGLaserPoints.resize(3, nrOfDatapoints);
 
     pthread_mutex_lock(&buff_mutex);
+    /*Sensor values to sensor cordinates */ 
     for (l = 0, m = message_index; l < message_count; l++, m = (m + MESSAGE_SIZE) % BUFFER_BYTES)
     {
         angle = ((messages[m + 1] >> 1) + (messages[m + 2] << 8)) >> 7;
@@ -271,10 +272,6 @@ void CoxAlgo()
     double ddx, ddy, dda = 0;
     for (n = 0; n < 10; n++)
     {
-        /*Resize matrices to current size depending on amount of data points*/
-
-        /*Sensor values to sensor cordinates */ // Flytta ut detta, samma varje itteration? Behåll Laserpoints oförändrad, kör Robotpoints
-
         /*Sensor cordinates to robot cordinates */
         /*TBD when lidar on robot*/
 
@@ -311,7 +308,7 @@ void CoxAlgo()
         }
 
         /* TODO: REMOVE OUTLIERS*/
-
+        
         tempA.resize(nrOfDatapoints, 3);
         tempAT.resize(3, nrOfDatapoints);
         for (i = 0; i < nrOfDatapoints; i++)
