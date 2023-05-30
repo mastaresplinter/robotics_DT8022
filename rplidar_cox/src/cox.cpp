@@ -191,6 +191,8 @@ Matrix<double, 3, Dynamic> tempAT;
 Matrix<double, Dynamic, 2> shortest;
 Matrix<double, 3, 1> Bm;
 
+Matrix<double, 3, 3> C;
+
 int first = 1;
 
 int temparray[300][3];
@@ -341,9 +343,13 @@ void CoxAlgo()
         {
             /*TODO ADD COVARIANCE CALCULATION*/
             // n = max(size(A))
+            int n = tempAT.rows();
             // s2 = (shortest-tempA*Bm).transpose()*(shortest-tempA*Bm)/(n-4)
+            VectorXd diff = shortest - tempA * Bm;
+            double s2 = (diff.transpose() * diff)(0,0) / static_cast<double>(n - 4);
             // C = s2*(tempAT*tempA).inverse()
-            // break;
+            C = s2 * (tempA.transpose() * tempA).inverse();
+            break;
         }
     }
     // std::cout <<" Total Dx: " << ddx <<" Total Dy: " << ddy <<" Total Da: " << dda << std::endl;
@@ -351,90 +357,90 @@ void CoxAlgo()
     cox_called_flag = DISABLED;
 }
 
-// int main()
-// {
+int main()
+{
 
-//     endpointsm << 49, 385,
-//         410, 394,
-//         421, 201,
-//         360, 98,
-//         55, 97;
+    endpointsm << 49, 385,
+        410, 394,
+        421, 201,
+        360, 98,
+        55, 97;
 
-//     rotm << 0, -1,
-//         1, 0;
+    rotm << 0, -1,
+        1, 0;
 
-//     /* Assumed start position */
-//     Rx = 250;
-//     Ry = 250;
-//     Ra = 0;
-//     unitVectorsm.resize(WALLSEGMENTS, 2);
-//     // Allt detta vill vi göra en gång någonsin, inte varje gång cox kallas!!! Fixa på ngt sätt
-//     for (int i = 0; i < WALLSEGMENTS; i++)
-//     {
+    /* Assumed start position */
+    Rx = 250;
+    Ry = 250;
+    Ra = 0;
+    unitVectorsm.resize(WALLSEGMENTS, 2);
+    // Allt detta vill vi göra en gång någonsin, inte varje gång cox kallas!!! Fixa på ngt sätt
+    for (int i = 0; i < WALLSEGMENTS; i++)
+    {
 
-//         double tempDx = endpointsm(linesBox[i][1], 0) - endpointsm(linesBox[i][0], 0);
-//         double tempDy = endpointsm(linesBox[i][1], 1) - endpointsm(linesBox[i][0], 1);
+        double tempDx = endpointsm(linesBox[i][1], 0) - endpointsm(linesBox[i][0], 0);
+        double tempDy = endpointsm(linesBox[i][1], 1) - endpointsm(linesBox[i][0], 1);
 
-//         unitVectorsm(i, 0) = -tempDy / sqrt(pow(tempDx, 2) + pow(tempDy, 2));
-//         unitVectorsm(i, 1) = tempDx / sqrt(pow(tempDx, 2) + pow(tempDy, 2));
+        unitVectorsm(i, 0) = -tempDy / sqrt(pow(tempDx, 2) + pow(tempDy, 2));
+        unitVectorsm(i, 1) = tempDx / sqrt(pow(tempDx, 2) + pow(tempDy, 2));
 
-//         distToWall[i] = abs(unitVectorsm.row(i).dot(endpointsm.row(i)));
+        distToWall[i] = abs(unitVectorsm.row(i).dot(endpointsm.row(i)));
 
-//         // std::cout <<"X: " << unitVectorsm(i,0) << std::endl;
-//         // std::cout <<"Y: " << unitVectorsm(i,1) << std::endl;
-//         // std::cout <<"Dist: " << distToWall[i] << std::endl;
-//     }
+        // std::cout <<"X: " << unitVectorsm(i,0) << std::endl;
+        // std::cout <<"Y: " << unitVectorsm(i,1) << std::endl;
+        // std::cout <<"Dist: " << distToWall[i] << std::endl;
+    }
 
-//     int counter, counter2, counter3 = 0; // 74495
-//     int oldangle = -1;
-//     // std::ifstream myfile ("CoxTestfile.txt");
-//     int angle, quality, distance;
-//     nrOfDatapoints = 149;
+    int counter, counter2, counter3 = 0; // 74495
+    int oldangle = -1;
+    // std::ifstream myfile ("CoxTestfile.txt");
+    int angle, quality, distance;
+    nrOfDatapoints = 149;
 
-//     // auto begin = std::chrono::high_resolution_clock::now();
-//     CoxAlgo();
-//     // Stop measuring time and calculate the elapsed time
-//     // auto end = std::chrono::high_resolution_clock::now();
-//     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    // auto begin = std::chrono::high_resolution_clock::now();
+    CoxAlgo();
+    // Stop measuring time and calculate the elapsed time
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
-//     // printf("Time measured: %.3f seconds.\n", elapsed.count() * 1e-9);
-//     /*if ( myfile.is_open() ) { // always check whether the file is open
-//         while(myfile)
-//         {
+    // printf("Time measured: %.3f seconds.\n", elapsed.count() * 1e-9);
+    /*if ( myfile.is_open() ) { // always check whether the file is open
+        while(myfile)
+        {
 
-//             myfile >> quality; //296 max values
-//             myfile >> angle;
-//             myfile >> distance;
-//             counter3++;
-//             if (quality != 0)
-//             {
-//                 if ((angle < oldangle)&&(oldangle>355))
-//                 {
-//                     counter2++;
-//                     if (counter2 == 10)
-//                     {
-//                         nrOfDatapoints = counter;
-//                         std::cout <<"Index: "<< counter3 << std::endl;
-//                         CoxAlgo();
-//                         counter2 = 0;
-//                     }
+            myfile >> quality; //296 max values
+            myfile >> angle;
+            myfile >> distance;
+            counter3++;
+            if (quality != 0)
+            {
+                if ((angle < oldangle)&&(oldangle>355))
+                {
+                    counter2++;
+                    if (counter2 == 10)
+                    {
+                        nrOfDatapoints = counter;
+                        std::cout <<"Index: "<< counter3 << std::endl;
+                        CoxAlgo();
+                        counter2 = 0;
+                    }
 
-//                     counter = 0;
-//                     oldangle = -1;
-//                 }
-//                 else
-//                 {
-//                     oldangle = angle;
-//                 }
+                    counter = 0;
+                    oldangle = -1;
+                }
+                else
+                {
+                    oldangle = angle;
+                }
 
-//                 temparray[counter][0] = quality;
-//                 temparray[counter][1] = angle;
-//                 temparray[counter][2] = distance;
-//                 counter++;
+                temparray[counter][0] = quality;
+                temparray[counter][1] = angle;
+                temparray[counter][2] = distance;
+                counter++;
 
-//             }
+            }
 
-//         }
-//     }*/
-//     // Till hit
-// }**/
+        }
+    }*/
+    // Till hit
+}
