@@ -1,6 +1,0 @@
-cmake_minimum_required(VERSION 3.0)
-project( camera )
-find_package( OpenCV REQUIRED)
-include_directories ( ${OpenCV_INCLUDE_DIRS} )
-add_executable(camera main.cpp)
-target_link_libraries( camera ${OpenCV_LIBS})

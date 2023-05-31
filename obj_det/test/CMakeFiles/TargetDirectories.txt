@@ -1,3 +1,0 @@
-/home/pi/test/CMakeFiles/edit_cache.dir
-/home/pi/test/CMakeFiles/rebuild_cache.dir
-/home/pi/test/CMakeFiles/camera.dir
