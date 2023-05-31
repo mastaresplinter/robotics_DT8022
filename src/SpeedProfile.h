@@ -12,7 +12,6 @@ extern "C"
     extern Eigen::Matrix<double, 3, 3> odoCovariance;
 
     void odometry();
-    void driveStrightCalc();
 
 #endif
 

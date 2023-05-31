@@ -28,8 +28,6 @@ extern "C"
 
     extern volatile int run_camera_flag;
 
-    // extern volatile int turnFlag;
-
     extern Eigen::Matrix<double, 3, 1> global_pos;
 
     extern Eigen::Matrix<double, 3, 1> global_Poscox;

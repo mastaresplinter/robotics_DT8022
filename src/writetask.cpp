@@ -101,21 +101,6 @@ void *WriteFilesThread(void *arg)
         cox_data.Timestamp = elapsed_time;
         kal_data.Timestamp = elapsed_time;
 
-        // odo_data.positions << 1, 2, 3;
-        // odo_data.uncertainty << 1, 2, 3,
-        //                 4, 5, 6,
-        //                 7, 8, 9;
-
-        // cox_data.positions << 1, 2, 3;
-        // cox_data.uncertainty << 1, 2, 3,
-        //                 4, 5, 6,
-        //                 7, 8, 9;
-
-        // kal_data.positions << 1, 2, 3;
-        // kal_data.uncertainty << 1, 2, 3,
-        //                 4, 5, 6,
-        //                 7, 8, 9;
-        // pthread_mutex_lock(&filewrite_mutex)
         odo_data.positions = global_pos;
         odo_data.uncertainty = global_Cxya;
 
@@ -124,7 +109,6 @@ void *WriteFilesThread(void *arg)
 
         kal_data.positions = global_Poskal;
         kal_data.uncertainty = global_Ckal;
-        // pthread_mutex_unlock(&filewrite_mutex);
 
         WriteDataToFile(&odo_data, 1);
         WriteDataToFile(&cox_data, 2);
@@ -135,25 +119,3 @@ void *WriteFilesThread(void *arg)
 
     return NULL;
 }
-
-// int main(void)
-// {
-//     global_Cxya << 1, 2, 3,
-//                     4, 5, 6,
-//                     7, 8, 9;
-//     global_Ccox << 1, 2, 3,
-//                     4, 5, 6,
-//                     7, 8, 9;
-//     global_Ckal << 1, 2, 3,
-//                     4, 5, 6,
-//                     7, 8, 9;
-
-//     global_Posxya << 1, 2, 3;
-//     global_Poscox << 1, 2, 3;
-//     global_Poskal << 1, 2, 3;
-
-//     pthread_t thread;
-//     pthread_create(&thread, NULL, WriteFilesThread, NULL);
-//     pthread_join(thread, NULL);
-//     return 0;
-// }

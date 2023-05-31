@@ -3,7 +3,6 @@
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
-// #include <cmath.h>
 #include "spi_com.h"
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
@@ -118,8 +117,6 @@ void angularDif()
         orientionGoal += 2 * M_PI;
     }
 
-    // std::cout << "dif: " << diff << std::endl;
-    // turnFlag = 1;
     if (flag == 1)
     {
         std::cout << "NEW POINT CALC" << std::endl;
@@ -235,14 +232,6 @@ void softTurn()
     }
 }
 
-void driveStrightCalc()
-{
-
-    angularDif();
-    // std::cout << "Ori goal: " <<  (orientionGoal)*180/M_PI << std::endl;
-    /*if (pos(2,0)-orientionGoal > 2*M_PI/180)
-        turnFlag = 1;*/
-}
 void driveFromCamera()
 {
     if (boxInRange == ACTIVE)
@@ -296,16 +285,13 @@ void driveFromCamera()
         MotorData.Set_Speed_M2 = -(speed * scalar);
     }
 }
-void test()
+void goToPos()
 {
 
     if (!done)
     {
-        // std::cout << turnFlag << std::endl;
-        // std::cout << "Encoder goal: " << encoderAtDist << " Encoder current: " << MotorData.Encoder_M1 << std::endl;
         if (!turnFlag)
         {
-            // std::cout << "DRIVING" << std::endl;
             if (d > 100)
             {
                 double tempdx = pos(0, 0) - goalVector(0, 0);
@@ -352,78 +338,37 @@ void test()
 
             MotorData.Set_Speed_M1 = speed;
             MotorData.Set_Speed_M2 = -speed;
-            // double tempPos = pos(2, 0);
-            // double tempOri = orientationGoal;
-            // if(pos(2, 0) < 0)
-            //	tempPos = pos(2,0) + 2*M_PI;
-            // if(orientationGoal < 0)
-            //	tempOri = orientationGoal + 2*M_PI;
-            /*if(fabs(diff) > 10*M_PI/180) // Correct by turn Right
-                {
-                    //turnOrientationFlag = -1;
-                    turnFlag = 1;
-                std::cout << "CORRECT" << std::endl;
-                std::cout << "ori: " << orientionGoal << std::endl;
-                    std::cout << "pos: " << pos(2,0) << std::endl;
-
-                    std::cout << "TURNDIR: " << turnOrientationFlag << std::endl;
-
-                //MotorData.Set_Speed_M1=(speed*0.9);
-                }
-
-
-
-            if(fabs(diff)> 0.3*M_PI/180) // Correct by turn Right
-                {
-                    //turnOrientationFlag = -1;
-                    //turnFlag = 1;
-                    if(turnOrientationFlag == -1)
-                    MotorData.Set_Speed_M1=(speed*0.95);
-                else
-                    MotorData.Set_Speed_M2=-(speed*0.95);
-
-                } */
 
             if (pos(2, 0) - orientionGoal > 10 * M_PI / 180) // Correct by turn Right
             {
-                // turnOrientationFlag = -1;
                 turnFlag = 1;
                 std::cout << "RIGHT" << std::endl;
                 std::cout << "ori: " << orientionGoal << std::endl;
                 std::cout << "pos: " << pos(2, 0) << std::endl;
-                // MotorData.Set_Speed_M1=(speed*0.9);
             }
             else if (pos(2, 0) - orientionGoal < -10 * M_PI / 180) // Correct by turn left
             {
-                // turnOrientationFlag = 1;
                 turnFlag = 1;
                 std::cout << "LEFT" << std::endl;
                 std::cout << "ori: " << orientionGoal << std::endl;
                 std::cout << "pos: " << pos(2, 0) << std::endl;
-                // MotorData.Set_Speed_M2=-(speed*0.9);
             }
 
             if (pos(2, 0) - orientionGoal > 0.3 * M_PI / 180) // Correct by turn Right
             {
-                // turnOrientationFlag = -1;
-                // turnFlag = 1;
                 MotorData.Set_Speed_M1 = (speed * 0.95);
             }
             else if (pos(2, 0) - orientionGoal < -0.3 * M_PI / 180) // Correct by turn left
             {
-                // turnOrientationFlag = 1;
-                // turnFlag = 1;
                 MotorData.Set_Speed_M2 = -(speed * 0.95);
             }
         }
         else
         {
-
             MotorData.Set_Speed_M1 = 500 * turnOrientationFlag;
             MotorData.Set_Speed_M2 = 500 * turnOrientationFlag;
             if (fabs(pos(2, 0) - orientionGoal) < 5 * M_PI / 180)
             {
-                // std::cout << "DRIVE TURN COMPLETE" << std::endl;
                 turnFlag = 0;
                 MotorData.Set_Speed_M1 = 0;
                 MotorData.Set_Speed_M2 = 0;
@@ -432,7 +377,7 @@ void test()
                 double tempdy = pos(1, 0) - goalVector(1, 0);
 
                 d = sqrt(pow(tempdx, 2) + pow(tempdy, 2)); // distance to drive
-                                                           /*                   ENCODER AT START*/
+                /*ENCODER AT START*/
                 encoderAtDist = MotorData.Encoder_M1 + nrOfPulsesPermm * d;
             }
         }
@@ -462,7 +407,6 @@ void test()
 
 void findCube()
 {
-    // softTurn();
     hardTurn();
 }
 
@@ -559,8 +503,6 @@ void waitForIdent()
 void stateMachine()
 {
 
-    // std::cout << targetAquired << std::endl;
-    // std::cout << spinUntilTarget << std::endl;
     switch (activeMode)
     {
     case start:
@@ -585,7 +527,7 @@ void stateMachine()
         break;
     case goHome:
         // std::cout << "GOHOME"<< std::endl;
-        test();
+        goToPos();
         break;
     case dropCube:
         // std::cout << "DROPCUBE"<< std::endl;
@@ -602,8 +544,6 @@ void stateMachine()
 
 void odometry()
 {
-    // odoCovariance = global_Cxya;
-
     if (firstly == 1)
     {
         Send_Read_Motor_Data(&MotorData);
@@ -617,16 +557,11 @@ void odometry()
         firstly = 0;
     }
     stateMachine();
-    // test();
-    // driveFromCamera();
-    // std::cout <<" ODO X: " << global_pos(0,0) <<" Y: " << global_pos(1,0) <<" A: " << global_pos(2,0)*180/M_PI << std::endl;
     Send_Read_Motor_Data(&MotorData);
     double vLeft = (encoderOldM2 - MotorData.Encoder_M2) / (nrOfPulsesPermm * SAMPLE_TIME);
     double vRight = (MotorData.Encoder_M1 - encoderOldM1) / (nrOfPulsesPermm * SAMPLE_TIME);
     double velo = (vLeft + vRight) / 2;
     double angVelo = (vRight - vLeft) / WHEEL_BASE;
-
-    // std::cout << velo << " " << angVelo << std::endl;
 
     dpos(2, 0) = angVelo * SAMPLE_TIME;
     dpos(0, 0) = velo * SAMPLE_TIME * cos(dpos(2, 0) / 2);
@@ -644,16 +579,13 @@ void odometry()
         sin(pos(2, 0) + dpos(2, 0) / 2), (velo * SAMPLE_TIME / 2) * cos(pos(2, 0) + dpos(2, 0) / 2),
         0, 1;
 
-    //[cos(A(kk-1)+ dA/2) -(dD/2)*sin(A(kk-1)+ dA/2);
     odoJacobian << 1, 0, -velo * SAMPLE_TIME * sin(pos(2, 0) + dpos(2, 0) / 2),
         0, 1, velo * SAMPLE_TIME * cos(pos(2, 0) + dpos(2, 0) / 2),
         0, 0, 1;
-    // [1 0 -dD*sin(A(kk-1)+dA/2);0 1 dD*cos(A(kk-1)+dA/2);0 0 1];
 
     // Law of error propagation
     odoCovariance = odoJacobian * odoCovariance * odoJacobian.transpose() + encoderJacobian * encoderCovariance * encoderJacobian.transpose();
 
-    // std::cout << odoCovariance << std::endl;
     //  Update position and save encoder values
     pos = pos + odo * dpos; // Moda med 2pi? Vad händer om vi snurrar åt vänster ist?
 
@@ -667,36 +599,4 @@ void odometry()
 
     global_pos = pos;
     global_Cxya = odoCovariance;
-
-    // std::cout << "Ang: " <<  pos(2,0)*180/M_PI << std::endl;
 }
-
-// int main()
-// {
-//    pos << 0,
-//           0,
-//           0;
-
-//     goalVector << 200,
-//                   200;
-
-//     odoCovariance << 1, 0, 0,
-//                      0, 1, 0,
-//                      0, 0, pow((M_PI/180),2);
-
-//     //wiringPiSetup();
-// 	//wiringPiSPISetup(SPI_Channel, 1000000);
-
-//     MotorData.Set_Speed_M1=500;
-// 	MotorData.Set_Speed_M2=-500;
-//     odometery();
-//     //while(1)
-//     //{
-
-//         //odometery();
-//         // std::cout << pos(0,0) << " " << pos(1,0) << " "<< pos(2,0)<< std::endl;
-
-//         //usleep(9500);
-//     //}
-
-// }

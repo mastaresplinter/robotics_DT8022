@@ -18,9 +18,8 @@ extern "C"
 #define ACTIVE 999
 #define DISABLED 333
 
-    // global circular buffer for storing messages
+    // global buffer for storing messages
     extern char messages[BUFFER_BYTES];
-    // lidar_message_t messages[BUFFER_SIZE];
     extern volatile int message_count; // Global var to count number of messages
     extern volatile int message_index; // Global var to keep track of message index
     extern pthread_mutex_t buff_mutex; // mutex to be able to handle the global buffer from different threads

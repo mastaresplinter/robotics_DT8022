@@ -17,8 +17,6 @@
 
 using namespace Eigen;
 
-// MotorDataType MotorData;
-
 static const int SPI_Channel = 1;
 
 volatile double global_ddx = 0;
@@ -51,39 +49,22 @@ void Kalman(void)
         Matrix<double, 3, 1> temp3;
         Matrix<double, 3, 3> Cxya_newnew;
 
-        // Ccox = [C(1,1:3); C(2,1:3); C(3,1:3)];
         Ccox = global_Ccox;
-        // Cxya = [P(kk-1,1:3);P(kk-1,4:6);P(kk-1,7:9)];
         Cxya = global_Cxya;
 
-        // Xcox = [X(kk-1) + dx;
-        //         Y(kk-1) + dy;
-        //         A(kk-1) + da];
         Xcox << global_pos(0, 0) + global_ddx,
             global_pos(1, 0) + global_ddy,
             global_pos(2, 0) + global_dda;
         global_Poscox = Xcox; // Set global COX position for filewrite
-        // std::cout <<" COX2 X: " << Xcox(0,0) <<" Y: " << Xcox(1,0) <<" A: " << Xcox(2,0)*180/M_PI << std::endl;
-        // std::cout <<" COX2 ddX: " << global_ddx <<" ddY: " << global_ddy <<" ddA: " << global_dda*180/M_PI << std::endl;
-        //  Xdr = [X(kk-1);
-        //         Y(kk-1);
-        //         A(kk-1)];
+
         Xdr << global_pos(0, 0),
             global_pos(1, 0),
             global_pos(2, 0);
 
-        // std::cout << Ccox << std::endl;
-
-        // Temp1 = Ccox*inv(Ccox+Cxya)*Xdr;
         temp1 = Ccox * ((Ccox + Cxya).inverse()) * Xdr;
-        // Temp2 = Cxya*inv(Ccox+Cxya)*Xcox;
         temp2 = Cxya * ((Ccox + Cxya).inverse()) * Xcox;
-        // Temp3 = Temp1+Temp2;
         temp3 = temp1 + temp2;
 
-        // X(kk-1) = Temp3(1);
-        // Y(kk-1) = Temp3(2);
-        // A(kk-1) = (Temp3(3));
         temp3(2, 0) = fmod(temp3(2, 0), 2 * M_PI);
 
         if (temp3(2, 0) < 0)
@@ -97,16 +78,13 @@ void Kalman(void)
         global_Poskal = global_pos; // Set global kalman position for filewrite.
 
         std::cout << " KAL X: " << temp3(0, 0) << " Y: " << temp3(1, 0) << " A: " << temp3(2, 0) * 180 / M_PI << std::endl;
-        // Cxya_newnew = inv(inv(Ccox)+inv(Cxya));
         Cxya_newnew = (Ccox.inverse() + Cxya.inverse()).inverse();
 
         global_Ckal = Cxya_newnew; // Set global Kalman uncertainty for filewrite.
 
-        // P(kk-1,1:9) = [Cxya_newnew(1,1:3) Cxya_newnew(2,1:3) Cxya_newnew(3,1:3)];
         global_Cxya = Cxya_newnew;
         odoCovariance = global_Cxya;
         pos = global_pos;
-        // std::cout << global_Cxya << std::endl;
 }
 
 void *Task1Thread(void *arg)
@@ -150,17 +128,3 @@ void *Task1Thread(void *arg)
         }
         return NULL;
 }
-
-// int main(void){
-
-// 	// wiringPiSetup();
-// 	// wiringPiSPISetup(SPI_Channel, 1000000);
-
-//     MotorData.Set_Speed_M1=500;
-// 	MotorData.Set_Speed_M2=-500;
-
-// 	pthread_t thread;
-//   	pthread_create(&thread, NULL, Task1Thread, NULL);
-//   	pthread_join(thread, NULL);
-//   	return 0;
-// }

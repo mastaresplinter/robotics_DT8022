@@ -6,9 +6,6 @@
 #include "stop_vars.h"
 
 #include <opencv2/opencv.hpp> //OpenCV header to use VideoCapture class//
-// #include <opencv2/core/core.hpp>
-// #include <opencv2/imgproc.hpp>
-// #include <opencv2/highgui.hpp>
 #include <iostream>
 #include <time.h>
 #include <unistd.h>
@@ -144,9 +141,6 @@ void *Task2Thread(void *arg)
                 widthOfLargestContour = boundingRectOfLargestContour.width;
                 heightOfLargestContour = boundingRectOfLargestContour.height;
                 colorRatio = (double)nonMatchingPixelCount / (widthOfLargestContour * heightOfLargestContour);
-                // std::cout << "colorRatio: " << colorRatio << std::endl;
-                // std::cout << "Width: " << widthOfLargestContour << std::endl;
-                // std::cout << "Height: " << heightOfLargestContour << std::endl;
             }
             double dy = 0;
             double dx = 0;
@@ -159,15 +153,12 @@ void *Task2Thread(void *arg)
                     double cx = moments.m10 / moments.m00;
                     double cy = moments.m01 / moments.m00;
 
-                    // cout << "cx: " << cx << "cy: " << cy << endl;
-
                     int imageWidth = croppedImage.cols;
                     int imageHeight = croppedImage.rows;
 
                     dx = cx - imageWidth / 2;
                     dy = cy - imageHeight / 2;
                     distFromCenter = dx;
-                    // std::cout << "D: " << std::endl;
                 }
 
                 // Visualize the largest blue contour and the mask
